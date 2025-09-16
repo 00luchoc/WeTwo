@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 import mysql.connector
 
 app = Flask(__name__)
@@ -7,22 +7,23 @@ app = Flask(__name__)
 db_config = {
     "host": "10.9.120.5",
     "user": "wetwo",
+    "port": 3306,
     "password": "wetwo1234",
-    "database": "db"
+    "database": "WeTwo"
 }
 
 @app.route("/")
 def home():
     try:
         conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
-        cursor.execute("SELECT NOW();")  # Ejemplo: trae la fecha del servidor
-        result = cursor.fetchone()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM usuarios")
+        result = cursor.fetchall()
         cursor.close()
         conn.close()
-        return f"Conexión exitosa! Hora del servidor: {result[0]}"
+        return jsonify(result)   # 🔥 devuelve JSON
     except Exception as e:
-        return f"Error conectando a la base de datos: {e}"
+        return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
     app.run(debug=True)
