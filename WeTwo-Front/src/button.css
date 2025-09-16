@@ -1,0 +1,44 @@
+.btn {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #fff;
+  background: #e26d8c;
+}
+
+/* Glow al hover */
+.btn:hover {
+  box-shadow: 0 0 10px rgba(226, 109, 140, 0.8),
+    0 0 20px rgba(226, 109, 140, 0.6);
+  transform: scale(1.05);
+}
+
+/* Ripple effect */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+.btn::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(0);
+  animation: none;
+}
+.btn:active::after {
+  left: var(--x);
+  top: var(--y);
+  animation: ripple 0.6s linear;
+}
+@keyframes ripple {
+  to {
+    transform: scale(20);
+    opacity: 0;
+  }
+}

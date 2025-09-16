@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import "./styles.css";
+import Gallery from "./components/Gallery";
+import Opinions from "./components/Opinions";
 
 const SECTIONS = {
   hero: "Inicio",
   features: "Características",
   how: "Cómo funciona",
+  gallery: "Galería",
+  testimonials: "Opiniones",
   cta: "Empezar",
 };
 
@@ -31,10 +35,21 @@ export default function App() {
       {section === "hero" && (
         <section className="hero">
           <h1>Conectá con tu persona favorita, a la distancia</h1>
-          <p>Mensajes, muro compartido, juegos y cápsulas del tiempo. Todo en un solo lugar.</p>
+          <p>
+            Mensajes, muro compartido, juegos y cápsulas del tiempo. Todo en un
+            solo lugar.
+          </p>
           <div style={{ marginTop: "20px" }}>
-            <button className="primaryBtn" onClick={() => setSection("cta")}>Probar demo</button>
-            <button className="altBtn" style={{ marginLeft: "8px" }} onClick={() => setSection("features")}>Ver más</button>
+            <button className="primaryBtn" onClick={() => setSection("cta")}>
+              Probar demo
+            </button>
+            <button
+              className="altBtn"
+              style={{ marginLeft: "8px" }}
+              onClick={() => setSection("features")}
+            >
+              Ver más
+            </button>
           </div>
         </section>
       )}
@@ -77,25 +92,35 @@ export default function App() {
         </section>
       )}
 
+      {section === "gallery" && <Gallery />}
+
+      {section === "testimonials" && <Opinions />}
+
       {section === "cta" && (
         <section className="cta">
           <h2>Sumate a la beta</h2>
           <p>Dejá tu email y te avisamos cuando esté lista.</p>
-          <form className="ctaForm" onSubmit={(e)=>{e.preventDefault(); alert("¡Gracias! Te avisamos pronto.");}}>
+          <form
+            className="ctaForm"
+            onSubmit={(e) => {
+              e.preventDefault();
+              alert("¡Gracias! Te avisamos pronto.");
+            }}
+          >
             <input placeholder="tu@email.com" type="email" required />
-            <button className="primaryBtn" type="submit">Avisame</button>
-            <button className="altBtn" type="button">Más info</button>
+            <button className="primaryBtn" type="submit">
+              Avisame
+            </button>
+            <button className="altBtn" type="button">
+              Más info
+            </button>
           </form>
-
-          <h2 className="sectionTitle" >Sumate a la beta</h2>
-          <div className="testimonials">
-            <div className="testimonial">“Con WeTwo sentimos que estamos cerca aunque estemos lejos.”</div>
-            <div className="testimonial">“Es divertido compartir cosas pequeñas todos los días.”</div>
-          </div>
         </section>
       )}
 
-      <footer className="landingFooter">© {new Date().getFullYear()} WeTwo</footer>
+      <footer className="landingFooter">
+        © {new Date().getFullYear()} WeTwo
+      </footer>
     </div>
   );
 }

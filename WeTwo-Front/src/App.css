@@ -40,3 +40,38 @@
 .read-the-docs {
   color: #888;
 }
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.galleryItem {
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  font-weight: bold;
+  color: #fff;
+  animation: fadeIn 0.6s ease;
+}
+.pastel1 {
+  background: var(--brand);
+}
+.pastel2 {
+  background: var(--brand-violet);
+}
+.pastel3 {
+  background: var(--brand-alt);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
