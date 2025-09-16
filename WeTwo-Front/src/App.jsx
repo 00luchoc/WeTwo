@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import "./styles.css";
 
 const SECTIONS = {
   hero: "Inicio",
   features: "Características",
+  how: "Cómo funciona",
   cta: "Empezar",
 };
 
@@ -30,12 +32,16 @@ export default function App() {
         <section className="hero">
           <h1>Conectá con tu persona favorita, a la distancia</h1>
           <p>Mensajes, muro compartido, juegos y cápsulas del tiempo. Todo en un solo lugar.</p>
-          <button className="primaryBtn" onClick={() => setSection("cta")}>Probar demo</button>
+          <div style={{ marginTop: "20px" }}>
+            <button className="primaryBtn" onClick={() => setSection("cta")}>Probar demo</button>
+            <button className="altBtn" style={{ marginLeft: "8px" }} onClick={() => setSection("features")}>Ver más</button>
+          </div>
         </section>
       )}
 
       {section === "features" && (
         <section className="features">
+          <h2 className="sectionTitle">Un poco de lo que podés hacer</h2>
           <div className="feature">
             <h3>Muro compartido</h3>
             <p>Guardá recuerdos, notas e imágenes en común.</p>
@@ -51,6 +57,26 @@ export default function App() {
         </section>
       )}
 
+      {section === "how" && (
+        <section>
+          <h2 className="sectionTitle">Cómo funciona</h2>
+          <div className="steps">
+            <div className="step">
+              <h4>1. Creá tu vínculo</h4>
+              <p>Registrate y conectá con tu pareja o mejor amig@.</p>
+            </div>
+            <div className="step">
+              <h4>2. Compartí</h4>
+              <p>Notas, fotos, recuerdos y pequeños momentos diarios.</p>
+            </div>
+            <div className="step">
+              <h4>3. Disfrutá</h4>
+              <p>Usá juegos, rachas y cápsulas para mantener la conexión.</p>
+            </div>
+          </div>
+        </section>
+      )}
+
       {section === "cta" && (
         <section className="cta">
           <h2>Sumate a la beta</h2>
@@ -58,7 +84,14 @@ export default function App() {
           <form className="ctaForm" onSubmit={(e)=>{e.preventDefault(); alert("¡Gracias! Te avisamos pronto.");}}>
             <input placeholder="tu@email.com" type="email" required />
             <button className="primaryBtn" type="submit">Avisame</button>
+            <button className="altBtn" type="button">Más info</button>
           </form>
+
+          <h2 className="sectionTitle" >Sumate a la beta</h2>
+          <div className="testimonials">
+            <div className="testimonial">“Con WeTwo sentimos que estamos cerca aunque estemos lejos.”</div>
+            <div className="testimonial">“Es divertido compartir cosas pequeñas todos los días.”</div>
+          </div>
         </section>
       )}
 

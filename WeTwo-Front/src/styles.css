@@ -31,3 +31,63 @@ body { margin: 0; background: #fffaf7; color: var(--text); font-family: Inter, s
 .primaryBtn:hover { background: var(--brand-strong); }
 
 .landingFooter { text-align: center; color: var(--muted); padding: 28px 0; font-size: 14px; }
+
+:root {
+  --bg: #fffaf7;
+  --card: #ffffff;
+  --text: #222;
+  --muted: #6b7280;
+  --brand: #e26d8c;         /* rosa */
+  --brand-strong: #d35378;
+  --brand-alt: #5caee6;     /* celeste agregado */
+  --brand-alt-strong: #3b8dc4;
+  --line: #f0e6e2;
+}
+
+.sectionTitle {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 28px 0 12px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-alt));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin: 16px 0;
+}
+.step {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  padding: 16px;
+  text-align: center;
+}
+
+.testimonials {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+}
+.testimonial {
+  border-left: 4px solid var(--brand-alt);
+  padding: 12px;
+  background: #f7f8fa;
+  border-radius: 8px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.altBtn {
+  background: var(--brand-alt);
+  color: #e4dada;
+  border: 1px solid var(--brand-alt);
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+.altBtn:hover { background: var(--brand-alt-strong); }
