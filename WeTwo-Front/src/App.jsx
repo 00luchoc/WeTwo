@@ -32,8 +32,7 @@ export default function App() {
           ))}
         </nav>
       </header>
-
-      {section === "hero" && <Hero />}
+      
       {section === "hero" && <Hero setSection={setSection} />}
 
 
