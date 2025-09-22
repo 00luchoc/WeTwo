@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./styles.css";
 import Gallery from "./components/Gallery";
 import Opinions from "./components/Opinions";
+import Hero from "./components/Hero";
 
 const SECTIONS = {
   hero: "Inicio",
@@ -32,27 +33,9 @@ export default function App() {
         </nav>
       </header>
 
-      {section === "hero" && (
-        <section className="hero">
-          <h1>Conectá con tu persona favorita, a la distancia</h1>
-          <p>
-            Mensajes, muro compartido, juegos y cápsulas del tiempo. Todo en un
-            solo lugar.
-          </p>
-          <div style={{ marginTop: "20px" }}>
-            <button className="primaryBtn" onClick={() => setSection("cta")}>
-              Probar demo
-            </button>
-            <button
-              className="altBtn"
-              style={{ marginLeft: "8px" }}
-              onClick={() => setSection("features")}
-            >
-              Ver más
-            </button>
-          </div>
-        </section>
-      )}
+      {section === "hero" && <Hero />}
+      {section === "hero" && <Hero setSection={setSection} />}
+
 
       {section === "features" && (
         <section className="features">
@@ -93,9 +76,7 @@ export default function App() {
       )}
 
       {section === "gallery" && <Gallery />}
-
       {section === "testimonials" && <Opinions />}
-
       {section === "cta" && (
         <section className="cta">
           <h2>Sumate a la beta</h2>
@@ -124,3 +105,4 @@ export default function App() {
     </div>
   );
 }
+
