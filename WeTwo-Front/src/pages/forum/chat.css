@@ -1,0 +1,512 @@
+.chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+/* Botón flotante */
+.chat-button {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #e26d8c 0%, #6ec1e4 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(226, 109, 140, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+  color: white;
+  z-index: 1001;
+}
+
+.chat-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 25px rgba(226, 109, 140, 0.6);
+}
+
+.chat-button.has-notifications {
+  animation: pulse 2s infinite;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #e26d8c;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 2px solid white;
+}
+
+/* Ventana del chat */
+.chat-window {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  width: 350px;
+  height: 500px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(226, 109, 140, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 2px solid #e26d8c;
+  transform-origin: bottom right;
+}
+
+/* Animación de apertura */
+.chat-window.opening {
+  animation: expandFromPoint 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Animación de cierre (absorción) */
+.chat-window.closing {
+  animation: collapseToPoint 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+@keyframes expandFromPoint {
+  0% {
+    opacity: 0;
+    transform: scale(0.1) translate(30px, 30px);
+    border-radius: 50%;
+  }
+  70% {
+    transform: scale(1.05) translate(0, 0);
+    border-radius: 20px;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+    border-radius: 15px;
+  }
+}
+
+@keyframes collapseToPoint {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+    border-radius: 15px;
+  }
+  30% {
+    transform: scale(0.9) translate(10px, 10px);
+    border-radius: 20px;
+    opacity: 0.8;
+  }
+  60% {
+    transform: scale(0.4) translate(20px, 20px);
+    border-radius: 40px;
+    opacity: 0.5;
+  }
+  90% {
+    transform: scale(0.1) translate(28px, 28px);
+    border-radius: 50%;
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.05) translate(30px, 30px);
+    border-radius: 50%;
+    display: none;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 20px rgba(226, 109, 140, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 30px rgba(226, 109, 140, 0.8);
+  }
+  100% {
+    box-shadow: 0 4px 20px rgba(226, 109, 140, 0.4);
+  }
+}
+
+/* Efecto de distorsión en el botón durante la absorción */
+.chat-button.absorbing {
+  animation: absorbPulse 0.5s ease-in-out;
+}
+
+@keyframes absorbPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 20px rgba(226, 109, 140, 0.4);
+  }
+  25% {
+    transform: scale(0.9);
+    box-shadow: 0 6px 25px rgba(226, 109, 140, 0.8);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 8px 30px rgba(226, 109, 140, 1);
+  }
+  75% {
+    transform: scale(0.95);
+    box-shadow: 0 7px 28px rgba(226, 109, 140, 0.9);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 20px rgba(226, 109, 140, 0.4);
+  }
+}
+
+/* Header */
+.chat-header {
+  background: linear-gradient(135deg, #e26d8c 0%, #6ec1e4 100%);
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Contenido del chat */
+.chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Lista de chats */
+.chats-list {
+  padding: 15px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+
+.chats-list h4 {
+  margin-bottom: 15px;
+  color: #e26d8c;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.chat-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+  background: white;
+  border: 1px solid #f0f0f0;
+}
+
+.chat-item:hover {
+  background: linear-gradient(135deg, #fdf2f5 0%, #f2f9fd 100%);
+  transform: translateX(5px);
+  border-color: #e26d8c;
+}
+
+.chat-item.unread {
+  background: linear-gradient(135deg, #fdf2f5 0%, #f2f9fd 100%);
+  font-weight: 600;
+  border-left: 3px solid #e26d8c;
+}
+
+.chat-avatar {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, #e26d8c 0%, #6ec1e4 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-right: 12px;
+  color: white;
+}
+
+.chat-info {
+  flex: 1;
+}
+
+.chat-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.chat-preview {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.unread-count {
+  background: linear-gradient(135deg, #e26d8c 0%, #6ec1e4 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Chat activo */
+.active-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fafafa;
+}
+
+.chat-header-mini {
+  padding: 12px 15px;
+  background: linear-gradient(135deg, #e26d8c 0%, #6ec1e4 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  margin-right: 10px;
+  padding: 5px;
+  color: white;
+  transition: transform 0.2s ease;
+}
+
+.back-btn:hover {
+  transform: scale(1.2);
+}
+
+.messages-container {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: linear-gradient(135deg, #fdf2f5 0%, #f2f9fd 100%);
+}
+
+.message {
+  display: flex;
+}
+
+.message.sent {
+  justify-content: flex-end;
+}
+
+.message.received {
+  justify-content: flex-start;
+}
+
+.message-bubble {
+  max-width: 75%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message.sent .message-bubble {
+  background: linear-gradient(135deg, #e26d8c 0%, #d4597c 100%);
+  color: white;
+  border-bottom-right-radius: 5px;
+}
+
+.message.received .message-bubble {
+  background: linear-gradient(135deg, #6ec1e4 0%, #5ab3e0 100%);
+  color: white;
+  border-bottom-left-radius: 5px;
+}
+
+/* Input de mensajes */
+.message-input-container {
+  padding: 15px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  gap: 10px;
+  background: white;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.message-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #f0f0f0;
+  border-radius: 25px;
+  outline: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: #fafafa;
+}
+
+.message-input:focus {
+  border-color: #6ec1e4;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(110, 193, 228, 0.1);
+}
+
+.send-btn {
+  background: linear-gradient(135deg, #e26d8c 0%, #6ec1e4 100%);
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(226, 109, 140, 0.4);
+}
+
+.send-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(226, 109, 140, 0.6);
+}
+
+.send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Scrollbar personalizado */
+.chats-list::-webkit-scrollbar,
+.messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chats-list::-webkit-scrollbar-track,
+.messages-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.chats-list::-webkit-scrollbar-thumb,
+.messages-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #e26d8c 0%, #6ec1e4 100%);
+  border-radius: 3px;
+}
+
+.chats-list::-webkit-scrollbar-thumb:hover,
+.messages-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #d4597c 0%, #5ab3e0 100%);
+}
+
+/* Efectos de animación para mensajes nuevos */
+@keyframes messageSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message {
+  animation: messageSlide 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .chat-window {
+    width: 100vw;
+    height: 100vh;
+    bottom: 0;
+    right: 0;
+    border-radius: 0;
+    border: none;
+  }
+  
+  .chat-button {
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .message-bubble {
+    max-width: 85%;
+  }
+  
+  /* Ajustes para la animación en móvil */
+  .chat-window.closing {
+    animation: collapseToPointMobile 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+  }
+  
+  @keyframes collapseToPointMobile {
+    0% {
+      opacity: 1;
+      transform: scale(1) translate(0, 0);
+      border-radius: 0;
+    }
+    30% {
+      transform: scale(0.8) translate(40px, 40px);
+      border-radius: 30px;
+      opacity: 0.8;
+    }
+    60% {
+      transform: scale(0.3) translate(80px, 80px);
+      border-radius: 60px;
+      opacity: 0.4;
+    }
+    90% {
+      transform: scale(0.1) translate(90px, 90px);
+      border-radius: 90px;
+      opacity: 0.1;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.05) translate(95px, 95px);
+      border-radius: 95px;
+      display: none;
+    }
+  }
+}
