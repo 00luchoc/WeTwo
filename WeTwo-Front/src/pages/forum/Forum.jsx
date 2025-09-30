@@ -1,6 +1,6 @@
 import React from "react";
 import Chat from "./Chat"; // Asegúrate de la ruta correcta
-import './Forum.css'; // Opcional: estilos de la página
+import './forum.css'; // Opcional: estilos de la página
 
 const Forum = () => {
   return (
