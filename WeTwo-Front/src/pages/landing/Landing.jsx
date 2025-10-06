@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import '../../styles/styles.css';
+import { useNavigate } from "react-router-dom"; // 👈 importamos useNavigate
+import "../../styles/styles.css";
 import Gallery from "./Gallery";
 import Opinions from "./Opinions";
 import Hero from "./Hero";
@@ -15,6 +16,7 @@ const SECTIONS = {
 
 export default function Landing() {
   const [section, setSection] = useState("hero");
+  const navigate = useNavigate(); // 👈 inicializamos el hook
 
   return (
     <div className="landing">
@@ -25,7 +27,14 @@ export default function Landing() {
             <button
               key={key}
               className={`navBtn ${section === key ? "active" : ""}`}
-              onClick={() => setSection(key)}
+              onClick={() => {
+                if (key === "cta") {
+                  // 👇 si es “Empezar”, redirigimos
+                  navigate("/registro");
+                } else {
+                  setSection(key);
+                }
+              }}
             >
               {label}
             </button>
@@ -94,7 +103,9 @@ export default function Landing() {
         </section>
       )}
 
-      <footer className="landingFooter">© {new Date().getFullYear()} WeTwo</footer>
+      <footer className="landingFooter">
+        © {new Date().getFullYear()} WeTwo
+      </footer>
     </div>
   );
 }
