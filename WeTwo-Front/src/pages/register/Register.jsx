@@ -5,9 +5,34 @@ import "../../styles/register.css";
 export default function Register() {
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("¡Registro enviado! (acá iría la lógica real)");
+
+    const nombre = e.target[0].value;
+    const email = e.target[1].value;
+    const password = e.target[2].value;
+
+    try {
+      const response = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nombre, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("✅ Registro exitoso: " + data.mensaje);
+        navigate("/"); // vuelve al inicio
+      } else {
+        alert("⚠️ " + data.error);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("❌ Error de conexión con el servidor");
+    }
   };
 
   return (
