@@ -29,8 +29,8 @@ export default function Landing() {
               className={`navBtn ${section === key ? "active" : ""}`}
               onClick={() => {
                 if (key === "cta") {
-                  // 👇 si es “Empezar”, redirigimos
-                  navigate("/registro");
+                  // 👇 si es “Empezar”, redirigimos a /login
+                  navigate("/login"); // Cambio aquí: Redirige a login en lugar de registro
                 } else {
                   setSection(key);
                 }

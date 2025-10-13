@@ -3,21 +3,15 @@
   0% {
     background: linear-gradient(135deg, #ff7eb3 0%, #67c8f4 100%);
   }
-  25% {
-    background: linear-gradient(135deg, #67c8f4 0%, #ff7eb3 100%);
-  }
   50% {
-    background: linear-gradient(135deg, #ff7eb3 0%, #67c8f4 100%);
-  }
-  75% {
-    background: linear-gradient(135deg, #67c8f4 0%, #ff7eb3 100%);
+    background: linear-gradient(135deg, #ff89c7 0%, #70b9f3 100%);
   }
   100% {
     background: linear-gradient(135deg, #ff7eb3 0%, #67c8f4 100%);
   }
 }
 
-.register-container {
+.login-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -25,11 +19,12 @@
   background: linear-gradient(135deg, #ff7eb3 0%, #67c8f4 100%);
   padding: 20px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  animation: gradientAnimation 10s ease infinite; /* Gradiente suave y fluido */
-  background-size: 400% 400%; /* Aumentar el rango para una transición más amplia */
+  animation: gradientAnimation 10s ease infinite; /* Animación más lenta para un movimiento suave */
+  background-size: 400% 400%; /* Amplía el rango para un desplazamiento fluido */
+  transition: background 1s ease; /* Transición suave entre los colores */
 }
 
-.register-box {
+.login-box {
   background: white;
   padding: 40px;
   border-radius: 20px;
@@ -51,26 +46,38 @@
   }
 }
 
-.register-box h1 {
+.login-box h1 {
   color: #333;
   margin-bottom: 10px;
   font-size: 28px;
   font-weight: 700;
 }
 
-.register-box > p {
+.login-box > p {
   color: #666;
   margin-bottom: 30px;
   font-size: 16px;
 }
 
-.register-form {
+.login-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.register-form input {
+.form-group {
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.login-form input {
   width: 100%;
   padding: 15px;
   border: 2px solid #e1e5e9;
@@ -80,7 +87,7 @@
   box-sizing: border-box;
 }
 
-.register-form input:focus {
+.login-form input:focus {
   outline: none;
   border-color: #ff7eb3;
   box-shadow: 0 0 0 3px rgba(255, 126, 179, 0.1);
@@ -132,14 +139,25 @@
   font-weight: 500;
 }
 
+/* Enlace "Olvidaste tu contraseña" en rosa delicado */
+.forgot-password a {
+  color: #ff7eb3; /* Tono rosa más suave */
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
-  .register-box {
+  .login-box {
     padding: 30px 20px;
     margin: 10px;
   }
 
-  .register-box h1 {
+  .login-box h1 {
     font-size: 24px;
   }
 }

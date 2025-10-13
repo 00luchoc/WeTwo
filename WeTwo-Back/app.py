@@ -5,21 +5,25 @@ import bcrypt
 import os
 from dotenv import load_dotenv
 import time
+import logging
+
+# Configurar logging
+logging.basicConfig(level=logging.DEBUG)
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
-# Configuración mejorada de base de datos
 
+# Configuración mejorada de base de datos
 db_config = {
-    "host": "10.9.120.5",  # IP directa en lugar de localhost
+    "host": "10.9.120.5",
     "user": "wetwo",
     "password": "wetwo1234", 
-    "database": "WeTwo",  # Asegúrate del nombre exacto de la BD
+    "database": "WeTwo",
     "port": 3306,
-    "use_pure": True,  # Forzar el conector Python puro
-    "ssl_disabled": True,  # Deshabilitar SSL
+    "use_pure": True,
+    "ssl_disabled": True,
     "connection_timeout": 30
 }
 
@@ -34,7 +38,7 @@ def get_db_connection():
         except mysql.connector.Error as err:
             print(f"❌ Error de conexión (intento {attempt + 1}): {err}")
             if attempt < max_retries - 1:
-                time.sleep(2)  # Esperar 2 segundos antes de reintentar
+                time.sleep(2)
             else:
                 raise err
 
@@ -56,10 +60,20 @@ def test_db():
     except Exception as e:
         return jsonify({"error": f"❌ Error de conexión: {str(e)}"}), 500
 
-# 🔹 Registro normal 
-@app.route("/registro", methods=["POST"])
+# 🔹 Registro - ambas rutas para compatibilidad
+@app.route("/register", methods=["POST", "OPTIONS"])
+@app.route("/registro", methods=["POST", "OPTIONS"])
 def registro():
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
+        
     data = request.get_json()
+    
+    # Log para debugging
+    app.logger.info(f"Datos recibidos: {data}")
+    
+    if not data:
+        return jsonify({"error": "No se recibieron datos JSON"}), 400
     
     # Validar campos requeridos
     if not all([data.get("nombre"), data.get("email"), data.get("contraseña")]):
@@ -86,19 +100,23 @@ def registro():
         return jsonify({"message": "Usuario registrado con éxito"}), 201
         
     except mysql.connector.Error as err:
+        app.logger.error(f"Error de base de datos: {str(err)}")
         return jsonify({"error": f"Error de base de datos: {str(err)}"}), 500
     except Exception as e:
+        app.logger.error(f"Error del servidor: {str(e)}")
         return jsonify({"error": f"Error del servidor: {str(e)}"}), 500
     finally:
-        # Cerrar conexiones en el finally para asegurar que siempre se cierren
         if cursor:
             cursor.close()
         if conn and conn.is_connected():
             conn.close()
 
 # 🔹 Login simplificado
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["POST", "OPTIONS"])
 def login():
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
+        
     data = request.get_json()
     email = data.get("email")
     contraseña = data.get("contraseña")
@@ -140,6 +158,18 @@ def login():
             cursor.close()
         if conn and conn.is_connected():
             conn.close()
+
+# 🔹 Ruta para debugging de rutas
+@app.route("/debug-routes")
+def debug_routes():
+    routes = []
+    for rule in app.url_map.iter_rules():
+        routes.append({
+            "endpoint": rule.endpoint,
+            "methods": list(rule.methods),
+            "path": str(rule)
+        })
+    return jsonify({"routes": routes})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.getenv("PORT", 5000)), debug=True)
