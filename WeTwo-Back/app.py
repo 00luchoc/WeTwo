@@ -1,114 +1,145 @@
 from flask import Flask, request, jsonify
 import mysql.connector
-from dotenv import load_dotenv
 from flask_cors import CORS
 import bcrypt
 import os
+from dotenv import load_dotenv
+import time
 
-# Cargar variables de entorno (.env)
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Permite que tu frontend en React acceda a esta API
+CORS(app, resources={r"/*": {"origins": "*"}})
+# Configuración mejorada de base de datos
 
-# Configuración de base de datos
 db_config = {
-    "host": os.getenv("DB_HOST"),
-    "user": os.getenv("DB_USER"),
-    "port": int(os.getenv("DB_PORT")),
-    "password": os.getenv("DB_PASSWORD"),
-    "database": os.getenv("DB_NAME"),
+    "host": "10.9.120.5",  # IP directa en lugar de localhost
+    "user": "wetwo",
+    "password": "wetwo1234", 
+    "database": "WeTwo",  # Asegúrate del nombre exacto de la BD
+    "port": 3306,
+    "use_pure": True,  # Forzar el conector Python puro
+    "ssl_disabled": True,  # Deshabilitar SSL
+    "connection_timeout": 30
 }
 
-def get_connection():
-    return mysql.connector.connect(**db_config)
+def get_db_connection():
+    """Función mejorada para obtener conexión con reintentos"""
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            conn = mysql.connector.connect(**db_config)
+            print(f"✅ Conexión a MySQL establecida (intento {attempt + 1})")
+            return conn
+        except mysql.connector.Error as err:
+            print(f"❌ Error de conexión (intento {attempt + 1}): {err}")
+            if attempt < max_retries - 1:
+                time.sleep(2)  # Esperar 2 segundos antes de reintentar
+            else:
+                raise err
 
-# ------------------- RUTAS -------------------
+@app.route("/")
+def home():
+    return "Servidor Flask funcionando"
 
-# ✅ Registrar usuario
-@app.route("/register", methods=["POST"])
-def register():
-    data = request.get_json()
-    nombre = data.get("nombre")
-    email = data.get("email")
-    password = data.get("password")
-
-    if not (nombre and email and password):
-        return jsonify({"error": "Faltan campos"}), 400
-
+# 🔹 Verificar conexión a la base de datos
+@app.route("/test-db", methods=["GET"])
+def test_db():
     try:
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        # Verificar si ya existe el email
-        cursor.execute("SELECT * FROM usuarios WHERE email = %s", (email,))
-        existing_user = cursor.fetchone()
-        if existing_user:
-            return jsonify({"error": "El correo ya está registrado"}), 400
-
-        # Hashear la contraseña antes de guardarla
-        hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-
-        cursor.execute(
-            "INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)",
-            (nombre, email, hashed),
-        )
-        conn.commit()
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        result = cursor.fetchone()
         cursor.close()
         conn.close()
-
-        return jsonify({"mensaje": "Usuario registrado con éxito"}), 201
-
+        return jsonify({"message": "✅ Conexión a MySQL exitosa", "result": result})
     except Exception as e:
-        print(e)
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"❌ Error de conexión: {str(e)}"}), 500
 
+# 🔹 Registro normal 
+@app.route("/registro", methods=["POST"])
+def registro():
+    data = request.get_json()
+    
+    # Validar campos requeridos
+    if not all([data.get("nombre"), data.get("email"), data.get("contraseña")]):
+        return jsonify({"error": "Faltan campos obligatorios: nombre, email, contraseña"}), 400
+    
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Verificar si el email ya existe
+        cursor.execute("SELECT email FROM usuarios WHERE email = %s", (data.get("email"),))
+        if cursor.fetchone():
+            return jsonify({"error": "El email ya está registrado"}), 400
+        
+        sql = "INSERT INTO usuarios (nombre, email, contraseña) VALUES (%s, %s, %s)"
+        cursor.execute(sql, (
+            data.get("nombre"),
+            data.get("email"),
+            data.get("contraseña"),
+        ))
+        conn.commit()
+        return jsonify({"message": "Usuario registrado con éxito"}), 201
+        
+    except mysql.connector.Error as err:
+        return jsonify({"error": f"Error de base de datos: {str(err)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Error del servidor: {str(e)}"}), 500
+    finally:
+        # Cerrar conexiones en el finally para asegurar que siempre se cierren
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
 
-# ✅ Login de usuario
+# 🔹 Login simplificado
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
     email = data.get("email")
-    password = data.get("password")
+    contraseña = data.get("contraseña")
 
-    if not (email and password):
-        return jsonify({"error": "Faltan campos"}), 400
+    if not email or not contraseña:
+        return jsonify({"error": "Email y contraseña son requeridos"}), 400
 
+    conn = None
+    cursor = None
     try:
-        conn = get_connection()
+        conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM usuarios WHERE email = %s", (email,))
+        
+        cursor.execute("SELECT nombre, email, contraseña FROM usuarios WHERE email = %s", (email,))
         user = cursor.fetchone()
-        cursor.close()
-        conn.close()
 
         if not user:
             return jsonify({"error": "Usuario no encontrado"}), 404
-
-        if bcrypt.checkpw(password.encode("utf-8"), user["password"].encode("utf-8")):
-            return jsonify({"mensaje": "Login exitoso", "usuario": user["nombre"]}), 200
+        
+        # Verificar contraseña
+        if user["contraseña"] == contraseña:
+            user_data = {
+                "nombre": user["nombre"],
+                "email": user["email"],
+            }
+            return jsonify({
+                "message": "Login exitoso", 
+                "usuario": user_data
+            }), 200
         else:
             return jsonify({"error": "Contraseña incorrecta"}), 401
-
+            
+    except mysql.connector.Error as err:
+        return jsonify({"error": f"Error de base de datos: {str(err)}"}), 500
     except Exception as e:
-        print(e)
-        return jsonify({"error": str(e)}), 500
-
-
-# ✅ Obtener todos los usuarios (opcional)
-@app.route("/usuarios", methods=["GET"])
-def get_usuarios():
-    try:
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT id, nombre, email FROM usuarios")
-        result = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+        return jsonify({"error": f"Error del servidor: {str(e)}"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=int(os.getenv("PORT", 5000)), debug=True)
