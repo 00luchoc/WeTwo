@@ -1,8 +1,8 @@
 import FloatingHearts from "./FloatingHearts";
 import PhoneMockup from "./PhoneMockup";
-import "../../styles/hero.css";
+import "../../components/styles/hero.css";
 
-const Hero = ({setSection}) => {
+const Hero = ({ setSection }) => {
   return (
     <section className="hero-section">
       <FloatingHearts />
@@ -10,8 +10,10 @@ const Hero = ({setSection}) => {
         <div className="hero-text">
           <h1>Conectá con tu persona favorita, a la distancia</h1>
           <p>Mensajes, juegos y cápsulas del tiempo. Todo en un solo lugar.</p>
-             <div className="hero-buttons">
-            <button className="btn-primary" onClick={() => setSection("cta")}>Probar demo</button>
+          <div className="hero-buttons">
+            <button className="btn-primary" onClick={() => setSection("cta")}>
+              Probar demo
+            </button>
             <button className="btn-secondary">Ver más</button>
           </div>
         </div>

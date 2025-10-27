@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // 👈 importamos useNavigate
-import "../../styles/styles.css";
+import "../../components/styles/styles.css";
 import Gallery from "./Gallery";
 import Opinions from "./Opinions";
 import Hero from "./Hero";

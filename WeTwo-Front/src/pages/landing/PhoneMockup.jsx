@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import "../../styles/hero.css";
+import "../../components/styles/hero.css";
 
 const PhoneMockup = () => {
   const messages = [

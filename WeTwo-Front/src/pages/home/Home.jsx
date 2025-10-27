@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/home.css";
+import "../../components/styles/home.css";
 
 export default function Home() {
   const [user, setUser] = useState(null);

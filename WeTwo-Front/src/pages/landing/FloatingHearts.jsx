@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import "../../styles/floating.css";
+import "../../components/styles/floating.css";
 
 const FloatingHearts = () => {
   const hearts = ["💖", "💌", "🎶", "📸", "🎁"];
