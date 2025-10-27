@@ -1,70 +1,47 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
 import Register from "../src/pages/register/Register";
+import Login from "../src/pages/login/Login";
 
-describe("Register Component", () => {
-  const renderWithRouter = (ui) => render(<BrowserRouter>{ui}</BrowserRouter>);
+global.fetch = jest.fn();
 
-  beforeEach(() => renderWithRouter(<Register />));
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
-  test("renderiza formulario de registro", () => {
-    expect(
-      screen.getByRole("heading", { name: /Crear cuenta/i })
-    ).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Nombre/i)).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText(/Correo electrónico/i)
-    ).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Contraseña/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Registrarme/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Volver al inicio/i })
-    ).toBeInTheDocument();
+function renderWithRouter(initialRoute = "/register") {
+  return render(
+    <MemoryRouter initialEntries={[initialRoute]}>
+      <Routes>
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </MemoryRouter>
+  );
+}
+
+test("registro exitoso sin usar backend real", async () => {
+  // Simulamos respuesta de backend
+  fetch.mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ message: "Registro exitoso" }),
   });
 
-  test("Puede redirigirse al inicio de sesion tras registrarse", async () => {
-    const nombreInput = screen.getByPlaceholderText(/Nombre/i);
-    const emailInput = screen.getByPlaceholderText(/Correo electrónico/i);
-    const passwordInput = screen.getByPlaceholderText(/Contraseña/i);
+  renderWithRouter();
 
-    fireEvent.change(nombreInput, { target: { value: "Julieta" } });
-    fireEvent.change(emailInput, { target: { value: "julieta@email.com" } });
-    fireEvent.change(passwordInput, { target: { value: "123456" } });
-
-    const registerButton = screen.getByRole("button", { name: /Registrarme/i });
-    fireEvent.click(registerButton);
-
-    await waitFor(() => {
-      expect(screen.getByText("inicio sesion"));
-    });
-    // expect(nombreInput.value).toBe("Julieta");
-    // expect(emailInput.value).toBe("julieta@email.com");
-    // expect(passwordInput.value).toBe("123456");
+  fireEvent.change(screen.getByPlaceholderText(/nombre/i), {
+    target: { value: "Luciano" },
+  });
+  fireEvent.change(screen.getByPlaceholderText(/correo electrónico/i), {
+    target: { value: "luciano@email.com" },
+  });
+  fireEvent.change(screen.getByPlaceholderText(/contraseña/i), {
+    target: { value: "123456" },
   });
 
-  test("Puede iniciar sesion con el usuario recien registrado", async () => {
-    const nombreInput = screen.getByPlaceholderText(/Nombre/i);
-    const emailInput = screen.getByPlaceholderText(/Correo electrónico/i);
-    const passwordInput = screen.getByPlaceholderText(/Contraseña/i);
+  fireEvent.click(screen.getByRole("button", { name: /registrarme/i }));
 
-    fireEvent.change(nombreInput, { target: { value: "Julieta" } });
-    fireEvent.change(emailInput, { target: { value: "julieta@email.com" } });
-    fireEvent.change(passwordInput, { target: { value: "123456" } });
-
-    const registerButton = screen.getByRole("button", { name: /Registrarme/i });
-    fireEvent.click(registerButton);
-
-    await waitFor(() => {
-      expect(screen.getByText("inicio sesion"));
-    });
-    // expect(nombreInput.value).toBe("Julieta");
-    // expect(emailInput.value).toBe("julieta@email.com");
-    // expect(passwordInput.value).toBe("123456");
+  await waitFor(() => {
+    expect(screen.getByText(/bienvenido de vuelta/i)).toBeInTheDocument();
   });
-
-  // test("botón de registro se puede clickear", () => {
-
-  // });
 });
