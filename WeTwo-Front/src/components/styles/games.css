@@ -1,0 +1,98 @@
+/* ---- Fuentes y Colores Base ---- */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap");
+
+:root {
+  --font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  --text-dark: #1e1e3a;
+  --text-light: #5a5a7b;
+  --pastel-pink: #fde2f3;
+  --pastel-blue: #e0f7fa;
+  --border-radius-card: 24px;
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-bg-hover: rgba(255, 255, 255, 0.2);
+  --glass-blur: blur(5px);
+}
+
+/* Contenedor Principal */
+.games-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family);
+  color: var(--text-dark);
+
+  /* Animación de fondo (Blanco a Rosa) */
+  animation: gradientAnimation 10s ease infinite;
+}
+
+/* Misma animación que en Home y Landing */
+@keyframes gradientAnimation {
+  0% {
+    background: linear-gradient(135deg, #ffffff 0%, #fdeaff 100%);
+  }
+  50% {
+    background: linear-gradient(135deg, #fff2f9 0%, #fdeaff 100%);
+  }
+  100% {
+    background: linear-gradient(135deg, #ffffff 0%, #fdeaff 100%);
+  }
+}
+
+/* Header */
+.games-header {
+  padding: 40px 20px 20px;
+  text-align: center;
+}
+.games-header h2 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+/* Grid de Juegos */
+.games-grid {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 0 20px 100px; /* Padding inferior para la nav bar */
+}
+
+.game-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-card);
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.game-card:hover {
+  background: var(--glass-bg-hover);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.game-card-icon {
+  font-size: 2.5rem; /* Icono más pequeño que en el diseño anterior */
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  /* Los colores se pasan por props de estilo */
+}
+.game-card h3 {
+  font-size: 1.4rem;
+  margin: 0 0 8px;
+}
+.game-card p {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin: 0;
+}

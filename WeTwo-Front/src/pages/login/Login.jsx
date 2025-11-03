@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// 1. Asegúrate de que tu CSS esté en la carpeta /styles/
 import "../../components/styles/login.css";
+// 2. Asegúrate de que apiConfig.js esté en src/
+import { API_URL } from "../../apiConfig.js";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,12 +13,16 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
+    // 3. ¡LA CORRECCIÓN MÁS IMPORTANTE!
+    // Esto evita que el formulario recargue la página.
     e.preventDefault();
+
     setError("");
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      // 4. Llama a tu backend
+      const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -26,10 +33,13 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        setTimeout(() => {
-          navigate("/home");
-        }, 1000);
+        // 5. Si el login es exitoso, guarda el token
+        localStorage.setItem("weTwoToken", data.token);
+
+        // 6. Y AHORA SÍ, redirige al home
+        navigate("/home");
       } else {
+        // 7. Si falla, muestra el error del backend
         setError(data.error || "Error al iniciar sesión");
       }
     } catch (error) {
@@ -49,21 +59,10 @@ export default function Login() {
         {error && (
           <div className="error">
             <strong>⚠️ {error}</strong>
-            {error === "Usuario no encontrado" && (
-              <div style={{ fontSize: "14px", marginTop: "5px" }}>
-                ¿Necesitas{" "}
-                <a
-                  href="/register"
-                  style={{ color: "#ff7eb3", textDecoration: "underline" }}
-                >
-                  crear una cuenta
-                </a>
-                ?
-              </div>
-            )}
           </div>
         )}
 
+        {/* 8. El 'onSubmit' llama a nuestra función handleSubmit */}
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">Correo electrónico</label>
@@ -87,10 +86,6 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-          </div>
-
-          <div className="forgot-password">
-            <a href="/forgot-password">¿Olvidaste tu contraseña?</a>
           </div>
 
           <button className="primaryBtn" type="submit" disabled={isLoading}>

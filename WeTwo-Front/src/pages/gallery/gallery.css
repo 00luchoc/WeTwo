@@ -1,0 +1,201 @@
+/* ---- Fuentes y Colores Base (Estética Pastel) ---- */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap");
+
+:root {
+  --font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  --text-dark: #1e1e3a;
+  --text-light: #5a5a7b;
+  --pastel-pink: #fde2f3;
+  --pastel-blue: #e0f7fa;
+  --accent-pink: #f472b6;
+  --accent-blue: #38bdf8;
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-blur: blur(10px);
+  --border-glass: 1px solid rgba(255, 255, 255, 0.6);
+  --card-radius: 24px;
+}
+
+/* ---- Contenedor Principal (CON FONDO GRADIENTE ESTÁTICO) ---- */
+.gallery-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  /* --- FONDO GRADIENTE ESTÁTICO --- */
+  background: linear-gradient(135deg, #ffffff 0%, #fdeaff 100%);
+}
+
+/* Contenido principal con scroll */
+.gallery-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 24px 20px 120px; /* Padding inferior para la nav bar */
+}
+
+.gallery-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0 0 4px;
+}
+
+.gallery-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin: 0 0 24px;
+}
+
+/* ---- Cuadrícula de la Galería ---- */
+.gallery-grid {
+  display: grid;
+  /* Columnas responsivas: se ajustan automáticamente */
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .gallery-grid {
+    /* En pantallas más grandes, las fotos son más grandes */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+}
+
+.gallery-item {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Mantiene las fotos cuadradas */
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--pastel-pink);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Asegura que la imagen llene el espacio */
+  transition: transform 0.3s ease;
+}
+
+.item-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0);
+  color: white;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.gallery-item:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+.gallery-item:hover img {
+  transform: scale(1.1);
+}
+.gallery-item:hover .item-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 1;
+}
+
+/* ---- Botón Flotante (FAB) ---- */
+.add-memory-btn {
+  position: fixed;
+  bottom: 100px; /* Justo encima de la nav bar */
+  right: 30px;
+
+  /* Gradiente de la app */
+  background: linear-gradient(to right, var(--accent-pink), var(--accent-blue));
+  color: white;
+
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+
+  box-shadow: 0 8px 20px rgba(244, 114, 182, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.add-memory-btn:hover {
+  transform: scale(1.1) rotate(90deg);
+}
+
+/* ---- Modal para ver Imagen ---- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.modal-content img {
+  width: 100%;
+  height: 100%;
+  max-height: 70vh; /* Límite de altura */
+  object-fit: contain; /* Muestra la imagen completa */
+  border-radius: var(--card-radius);
+}
+.modal-content p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+
+  background: white;
+  color: var(--text-dark);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
