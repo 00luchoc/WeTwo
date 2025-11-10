@@ -12,6 +12,7 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "firebase": "^12.5.0",
     "framer-motion": "^12.23.13",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -37,5 +38,18 @@
     "jest-environment-jsdom": "^30.2.0",
     "jsdom": "^27.0.1",
     "vite": "^7.1.2"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)$": "<rootDir>/__mocks__/fileMock.js"
+    },
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
   }
 }

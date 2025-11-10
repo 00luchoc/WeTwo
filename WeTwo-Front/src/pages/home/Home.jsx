@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNavBar from "../../components/layout/BottomNavBar";
-import "../../components/styles/home.css";
-import { API_URL, getAuthHeaders } from "../../apiConfig"; // 1. Importar API config
+import "../../components/styles/home.css"; // (Asegúrate que esta ruta es correcta)
+import { API_URL, getAuthHeaders } from "../../apiConfig.js"; // Importa los helpers
 
 import {
   FaUser,
@@ -17,13 +17,13 @@ import {
   FaLink,
 } from "react-icons/fa";
 
-// (Los sub-componentes ConnectionCard, QuickActions, etc. se quedan igual)
-// ...
-// Tarjeta principal que conecta a la pareja
+// ----- Sub-componentes para el Home (Widgets) -----
+
 const ConnectionCard = ({ user, partner, streak }) => (
   <div className="connection-card">
     <div className="profile-avatar user-avatar">
       <FaUser />
+      {/* El nombre ahora viene de MySQL */}
       <span>{user.nombre}</span>
     </div>
     <div className="streak-display">
@@ -33,13 +33,14 @@ const ConnectionCard = ({ user, partner, streak }) => (
     </div>
     <div className="profile-avatar partner-avatar">
       <FaUser />
+      {/* El nombre de la pareja viene de MySQL */}
       <span>{partner.nombre}</span>
     </div>
   </div>
 );
 
-// Fila de botones de acción rápida
 const QuickActions = ({ navigate }) => (
+  // (Este componente no cambia)
   <div className="quick-actions">
     <button className="action-btn" onClick={() => navigate("/chat")}>
       <FaPaperPlane />
@@ -60,8 +61,8 @@ const QuickActions = ({ navigate }) => (
   </div>
 );
 
-// Widget para la Pregunta del Día
 const DailyPrompt = ({ prompt, onRespond }) => (
+  // (Este componente no cambia)
   <div className="widget-card prompt-card">
     <div className="widget-header">
       <FaLightbulb className="widget-icon" />
@@ -74,8 +75,8 @@ const DailyPrompt = ({ prompt, onRespond }) => (
   </div>
 );
 
-// Widget para la lista de planes compartidos
 const SharedPlans = ({ plans }) => (
+  // (Este componente no cambia)
   <div className="widget-card plans-card">
     <div className="widget-header">
       <FaCheckSquare className="widget-icon" />
@@ -96,7 +97,7 @@ const SharedPlans = ({ plans }) => (
 );
 
 // ----- ¡NUEVO WIDGET! -----
-// Widget para conectar con tu pareja
+// Este widget se muestra si NO tienes pareja
 const ConnectPartnerWidget = ({ userCode, onConnect }) => {
   const [partnerCode, setPartnerCode] = useState("");
 
@@ -112,6 +113,7 @@ const ConnectPartnerWidget = ({ userCode, onConnect }) => {
         <h4>Conéctate con tu pareja</h4>
       </div>
       <p className="your-code-label">Tu código de conexión es:</p>
+      {/* Mostramos el código que vino del backend */}
       <p className="your-code">{userCode}</p>
       <hr className="divider" />
       <p className="prompt-text">Ingresa el código de tu pareja:</p>
@@ -133,13 +135,13 @@ const ConnectPartnerWidget = ({ userCode, onConnect }) => {
 
 // ----- Componente Principal del Home -----
 export default function Home() {
-  const [user, setUser] = useState(null);
-  const [partner, setPartner] = useState(null);
+  const [user, setUser] = useState(null); // Tu perfil de MySQL
+  const [partner, setPartner] = useState(null); // El perfil de tu pareja
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   // Datos de simulación (los moveremos a la BD luego)
-  const [streak, setStreak] = useState(0);
+  const [streak, setStreak] = useState(0); // (Esto aún es simulado)
   const [dailyPrompt, setDailyPrompt] = useState(
     "¿Cuál es tu recuerdo favorito de un viaje juntos?"
   );
@@ -148,7 +150,7 @@ export default function Home() {
     "Ver la nueva peli de Ghibli",
   ]);
 
-  // 2. Cargar datos reales del usuario al iniciar
+  // Cargar datos reales del usuario al iniciar
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("weTwoToken");
@@ -156,31 +158,32 @@ export default function Home() {
         navigate("/login"); // Si no hay token, fuera
         return;
       }
-      console.log(token);
 
       try {
         const response = await fetch(`${API_URL}/me`, {
-          method: "GET", // Aquí indicas el tipo de solicitud (GET en este caso)
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          method: "GET",
+          headers: getAuthHeaders(), // <-- Usa la función de apiConfig.js
         });
 
         if (!response.ok) {
           // Si el token es inválido, etc.
-          // localStorage.removeItem("weTwoToken");
+          localStorage.removeItem("weTwoToken");
           navigate("/login");
           return;
         }
 
         const data = await response.json();
-        setUser(data.user);
-        setPartner(data.partner);
 
-        // (Aquí también cargarías la racha, planes, etc. desde la BD)
+        // El backend (app.py) devuelve { "usuario": ..., "partner": ... }
+        if (data.usuario) {
+          setUser(data.usuario); // Guardamos tu perfil de MySQL
+          setPartner(data.partner); // Guardamos el perfil de tu pareja (o null si no hay)
+        } else {
+          throw new Error("Formato de datos de usuario incorrecto");
+        }
       } catch (error) {
         console.error("Error al cargar datos:", error);
+        localStorage.removeItem("weTwoToken");
         navigate("/login");
       } finally {
         setIsLoading(false);
@@ -190,7 +193,7 @@ export default function Home() {
     fetchUserData();
   }, [navigate]);
 
-  // 3. Función para conectar
+  // Función para conectar (se llama desde el nuevo widget)
   const handleConnect = async (partnerCode) => {
     if (!partnerCode) {
       alert("Por favor, ingresa un código.");
@@ -208,7 +211,9 @@ export default function Home() {
 
       if (response.ok) {
         alert("¡Conectados con éxito!");
-        window.location.reload(); // Recargar la página para ver a la pareja
+        // Recargamos la página para que el useEffect() vuelva a
+        // buscar al usuario y esta vez traiga a la pareja.
+        window.location.reload();
       } else {
         alert(`Error: ${data.error}`);
       }
@@ -222,8 +227,9 @@ export default function Home() {
     return <div className="loading-screen">Cargando...</div>;
   }
 
+  // Esto previene un error si el fetch falla y user es null
   if (!user) {
-    return <div>Error: Usuario no encontrado.</div>;
+    return <div className="loading-screen">Error: Usuario no encontrado.</div>;
   }
 
   return (
@@ -231,13 +237,13 @@ export default function Home() {
       <main className="home-content">
         <h1 className="home-greeting">Hola, {user.nombre}</h1>
 
-        {/* 4. Renderizado Condicional */}
+        {/* --- ¡ESTA ES LA LÓGICA PRINCIPAL! --- */}
         {!partner ? (
           // SI NO HAY PAREJA, MUESTRA EL WIDGET DE CONEXIÓN
           <>
             <p className="home-subtitle">Conéctate para empezar...</p>
             <ConnectPartnerWidget
-              userCode={user.connection_code}
+              userCode={user.connection_code} // Le pasamos el código que vino de /me
               onConnect={handleConnect}
             />
           </>
@@ -256,6 +262,7 @@ export default function Home() {
         )}
       </main>
 
+      {/* La barra de navegación se queda igual */}
       <BottomNavBar />
     </div>
   );

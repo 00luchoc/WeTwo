@@ -161,3 +161,27 @@
     font-size: 24px;
   }
 }
+
+/* Estilo para el botón de Google */
+.googleBtn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--button-radius);
+  background: #ffffff;
+  color: #333;
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.googleBtn:hover {
+  background: #f9f9f9;
+  border-color: #d0d0d0;
+}

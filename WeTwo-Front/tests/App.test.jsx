@@ -1,33 +1,62 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import App from "../src/App";
 
-describe("App Component", () => {
-  // NO necesitamos BrowserRouter aquí porque App ya lo tiene
-  test("se renderiza la landing page correctamente", () => {
-    render(<App />);
+// ⭐️ CORRECCIÓN: Mockea BrowserRouter para evitar el conflicto
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  BrowserRouter: ({ children }) => <div>{children}</div>,
+}));
+
+describe("Pruebas funcionales de App (Navegación)", () => {
+  test("debe navegar a la página de Login al hacer clic en 'Comenzar'", async () => {
+    // 1. Renderizar la App.
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+
+    // 2. Verificar que empezamos en la Landing Page
     expect(
-      screen.getByText(/Conectá con tu persona favorita/i)
+      screen.getByText(/La distancia no importa cuando hay un verdadero lazo/i)
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Mensajes, juegos y cápsulas del tiempo/i)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Probar demo/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Ver más/i })
-    ).toBeInTheDocument();
+
+    // 3. Simular el clic
+    fireEvent.click(screen.getByRole("button", { name: /Comenzar/i }));
+
+    // 4. Esperar a que la página de Login se cargue
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: /Bienvenido de vuelta/i })
+      ).toBeInTheDocument();
+    });
   });
 
-  test("los botones de navegación existen y se pueden clickear", () => {
-    render(<App />);
-    const inicioBtn = screen.getByRole("button", { name: /Inicio/i });
-    const galeriaBtn = screen.getByRole("button", { name: /Galería/i });
+  test("debe navegar a la página de Registro al hacer clic en 'Crear mi código único'", async () => {
+    // 1. Renderizar la App.
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
 
-    expect(inicioBtn).toBeInTheDocument();
-    expect(galeriaBtn).toBeInTheDocument();
+    // 2. Verificar que empezamos en la Landing Page
+    expect(
+      screen.getByText(/La distancia no importa cuando hay un verdadero lazo/i)
+    ).toBeInTheDocument();
 
-    fireEvent.click(inicioBtn);
-    fireEvent.click(galeriaBtn);
+    // 3. Simular el clic
+    fireEvent.click(
+      screen.getByRole("button", { name: /Crear mi código único/i })
+    );
+
+    // 4. Esperar a que la página de Registro se cargue
+    await waitFor(() => {
+      // Asumimos que la página de registro tiene este título
+      expect(
+        screen.getByRole("heading", { name: /Crea tu cuenta/i })
+      ).toBeInTheDocument();
+    });
   });
 });

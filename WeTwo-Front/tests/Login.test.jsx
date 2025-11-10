@@ -1,41 +1,129 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import Login from "../src/pages/login/Login";
+import { API_URL } from "../src/apiConfig";
 
-describe("Login Component", () => {
-  const renderWithRouter = (ui) => render(<BrowserRouter>{ui}</BrowserRouter>);
+// 1. SIMULAMOS (MOCK) LAS DEPENDENCIAS EXTERNAS
+const mockNavigate = jest.fn();
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => mockNavigate,
+}));
 
-  beforeEach(() => renderWithRouter(<Login />));
+const localStorageMock = (() => {
+  let store = {};
+  return {
+    getItem: (key) => store[key] || null,
+    setItem: (key, value) => (store[key] = value.toString()),
+    removeItem: (key) => delete store[key],
+    clear: () => (store = {}),
+  };
+})();
+Object.defineProperty(window, "localStorage", { value: localStorageMock });
 
-  test("renderiza correctamente todos los elementos", () => {
-    expect(
-      screen.getByRole("heading", { name: /Bienvenido de vuelta/i })
-    ).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/tu@email.com/i)).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText(/Ingresa tu contraseña/i)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Iniciar sesión/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: /¿Olvidaste tu contraseña\?/i })
-    ).toBeInTheDocument();
+const mockFetch = jest.spyOn(global, "fetch");
+
+// ----------------------------------------------------------------
+// 🔹 PRUEBAS FUNCIONALES DEL LOGIN
+// ----------------------------------------------------------------
+
+describe("Pruebas funcionales del Login", () => {
+  beforeEach(() => {
+    mockNavigate.mockClear();
+    mockFetch.mockClear();
+    localStorageMock.clear();
   });
 
-  test("puede escribir en los inputs", () => {
-    const emailInput = screen.getByPlaceholderText(/tu@email.com/i);
-    const passwordInput = screen.getByPlaceholderText(/Ingresa tu contraseña/i);
+  // Test 1: El flujo de "Login Exitoso"
+  test("debe llamar a la API, guardar el token y redirigir al /home en un login exitoso", async () => {
+    // A. ARRANGE
+    const mockToken = "mi-token-jwt-falso-123";
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        message: "Login exitoso",
+        token: mockToken,
+        usuario: { id: 1, nombre: "Julieta" },
+      }),
+    });
 
-    fireEvent.change(emailInput, { target: { value: "test@correo.com" } });
-    fireEvent.change(passwordInput, { target: { value: "123456" } });
+    // B. ACT
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
 
-    expect(emailInput.value).toBe("test@correo.com");
-    expect(passwordInput.value).toBe("123456");
+    fireEvent.change(screen.getByLabelText(/Correo electrónico/i), {
+      target: { value: "test@usuario.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/Contraseña/i), {
+      target: { value: "contraseña123" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Iniciar sesión/i }));
+
+    // C. ASSERT
+    await waitFor(() => {
+      // 1. ¿Llamamos a fetch? ¿Y a la URL correcta?
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${API_URL}/login`,
+        expect.anything()
+      );
+
+      // 2. ¿Enviamos el email y contraseña correctos en el body?
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          body: JSON.stringify({
+            email: "test@usuario.com",
+            contraseña: "contraseña123",
+          }),
+        })
+      );
+
+      // 3. ¿Se guardó el token en localStorage?
+      expect(localStorage.getItem("weTwoToken")).toBe(mockToken);
+
+      // 4. ¿Se redirigió al usuario al /home?
+      expect(mockNavigate).toHaveBeenCalledWith("/home");
+    });
   });
 
-  test("botón de login se puede clickear", () => {
-    const loginButton = screen.getByRole("button", { name: /Iniciar sesión/i });
-    fireEvent.click(loginButton);
+  // Test 2: El flujo de "Login Fallido"
+  test("debe mostrar un mensaje de error y no redirigir si la contraseña es incorrecta", async () => {
+    // A. ARRANGE
+    mockFetch.mockResolvedValue({
+      ok: false,
+      json: async () => ({
+        error: "Contraseña incorrecta",
+      }),
+    });
+
+    // B. ACT
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+    fireEvent.change(screen.getByLabelText(/Correo electrónico/i), {
+      target: { value: "test@usuario.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/Contraseña/i), {
+      target: { value: "contraseña-mala" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Iniciar sesión/i }));
+
+    // C. ASSERT
+    await waitFor(() => {
+      // 1. ¿Apareció el mensaje de error en pantalla?
+      expect(screen.getByText(/Contraseña incorrecta/i)).toBeInTheDocument();
+
+      // 2. ¿NO se guardó ningún token?
+      expect(localStorage.getItem("weTwoToken")).toBeNull();
+
+      // 3. ¿NO se redirigió al usuario?
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
   });
 });

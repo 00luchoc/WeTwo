@@ -256,3 +256,48 @@
 .btn-add-plan:hover {
   transform: scale(1.1);
 }
+.connect-card .widget-icon {
+  color: var(--accent-blue);
+}
+.your-code-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-align: center;
+  margin: 0;
+}
+.your-code {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  text-align: center;
+  margin: 8px 0 16px;
+  background: var(--pastel-blue);
+  padding: 10px;
+  border-radius: 12px;
+}
+.divider {
+  border: none;
+  border-top: 1px solid var(--pastel-pink);
+  margin: 16px 0;
+}
+.connect-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.connect-input {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid var(--pastel-blue);
+  border-radius: var(--button-radius);
+  font-family: var(--font-family);
+  font-size: 1rem;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+.connect-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}

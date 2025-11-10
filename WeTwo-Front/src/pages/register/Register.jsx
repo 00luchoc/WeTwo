@@ -3,6 +3,14 @@ import { useNavigate } from "react-router-dom";
 import "../../components/styles/login.css"; // (Reutilizamos los estilos de login)
 import { API_URL } from "../../apiConfig.js";
 
+// 1. Importar Firebase desde el NUEVO archivo de config
+import { auth } from "../../firebaseConfig";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
+
 export default function Register() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
@@ -12,37 +20,62 @@ export default function Register() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    // ---- ¡ESTA ES LA LÍNEA MÁGICA! ----
     e.preventDefault();
-    // ---------------------------------
-
     setError("");
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/register`, {
+      // 1. Crear el usuario en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // 2. Añadir el nombre al perfil de Firebase
+      await updateProfile(user, { displayName: nombre });
+
+      // 3. Enviar email de verificación
+      await sendEmailVerification(user);
+
+      // 4. Obtener el Token de Firebase
+      // (Lo necesitamos para autenticarnos con nuestro propio backend)
+      const token = await user.getIdToken();
+
+      // 5. Llamar a NUESTRO backend (Flask) para crear el perfil en MySQL
+      const backendResponse = await fetch(`${API_URL}/create-profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // <-- Token de Firebase
         },
         body: JSON.stringify({
+          // El backend puede extraer el 'uid' y 'email' del token,
+          // pero enviamos el 'nombre'
           nombre: nombre,
-          email: email,
-          contraseña: password,
         }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("¡Registro exitoso! Ahora inicia sesión.");
-        navigate("/login");
-      } else {
-        setError(data.error || "Error en el registro");
+      if (!backendResponse.ok) {
+        // Si el backend de Flask falla, tenemos un problema
+        throw new Error("Error al crear el perfil de usuario en el backend.");
       }
+
+      // 6. ¡Éxito!
+      alert(
+        "¡Registro exitoso! Te enviamos un email. Por favor, verifica tu correo antes de iniciar sesión."
+      );
+      navigate("/login");
     } catch (error) {
-      console.error("Error:", error);
-      setError("Error de conexión con el servidor");
+      console.error("❌ Error de Registro:", error);
+      if (error.code === "auth/email-already-in-use") {
+        setError("Este email ya está registrado.");
+      } else if (error.code === "auth/weak-password") {
+        setError("La contraseña debe tener al menos 6 caracteres.");
+      } else {
+        setError("Error en el registro. Intenta de nuevo.");
+      }
     } finally {
       setIsLoading(false);
     }
