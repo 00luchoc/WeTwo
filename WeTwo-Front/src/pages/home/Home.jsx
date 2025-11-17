@@ -211,11 +211,7 @@ export default function Home() {
 
       if (response.ok) {
         alert("¡Conectados con éxito!");
-        // Recargamos la página para que el useEffect() vuelva a
-        // buscar al usuario y esta vez traiga a la pareja.
-        window.location.reload();
-      } else {
-        alert(`Error: ${data.error}`);
+        reloadPage();
       }
     } catch (error) {
       console.error("Error al conectar:", error);
