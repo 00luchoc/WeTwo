@@ -4,3 +4,4 @@ mysql-connector-python
 flask-bcrypt
 python-dotenv
 flask_jwt_extended
+pytest
